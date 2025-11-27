@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,13 +51,6 @@
             background: #1a1a2e;
         }
 
-        .left-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            min-width: 200px;
-        }
-
         .info-panel {
             display: flex;
             flex-direction: column;
@@ -84,8 +76,7 @@
             font-weight: bold;
         }
 
-        #nextCanvas,
-        #holdCanvas {
+        #nextCanvas {
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 8px;
             background: #1a1a2e;
@@ -166,15 +157,15 @@
         }
     </style>
 </head>
-
 <body>
     <div class="container">
-        <div class="left-panel">
-            <div class="info-box">
-                <h2>보관함</h2>
-                <canvas id="holdCanvas" width="120" height="120"></canvas>
-            </div>
+        <div class="game-area">
+            <h1>🎮 테트리스</h1>
+            <canvas id="gameCanvas" width="300" height="600"></canvas>
+            <button id="startBtn">게임 시작</button>
+        </div>
 
+        <div class="info-panel">
             <div class="info-box">
                 <h2>점수</h2>
                 <p id="score">0</p>
@@ -189,15 +180,7 @@
                 <h2>라인</h2>
                 <p id="lines">0</p>
             </div>
-        </div>
 
-        <div class="game-area">
-            <h1>🎮 테트리스</h1>
-            <canvas id="gameCanvas" width="300" height="600"></canvas>
-            <button id="startBtn">게임 시작</button>
-        </div>
-
-        <div class="info-panel">
             <div class="info-box">
                 <h2>다음 블록</h2>
                 <canvas id="nextCanvas" width="120" height="120"></canvas>
@@ -209,7 +192,6 @@
                 <p><kbd>↑</kbd> 회전</p>
                 <p><kbd>↓</kbd> 빠른 낙하</p>
                 <p><kbd>Space</kbd> 즉시 낙하</p>
-                <p><kbd>C</kbd> 블럭 보관</p>
                 <p><kbd>P</kbd> 일시정지</p>
             </div>
         </div>
@@ -226,8 +208,6 @@
         const ctx = canvas.getContext('2d');
         const nextCanvas = document.getElementById('nextCanvas');
         const nextCtx = nextCanvas.getContext('2d');
-        const holdCanvas = document.getElementById('holdCanvas');
-        const holdCtx = holdCanvas.getContext('2d');
 
         const ROWS = 20;
         const COLS = 10;
@@ -257,8 +237,6 @@
         let board = [];
         let currentPiece = null;
         let nextPiece = null;
-        let holdPiece = null;
-        let canHold = true;
         let score = 0;
         let level = 1;
         let lines = 0;
@@ -277,7 +255,7 @@
             ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
             ctx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-
+            
             ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
             ctx.fillRect(x * BLOCK_SIZE + 2, y * BLOCK_SIZE + 2, BLOCK_SIZE - 4, BLOCK_SIZE - 4);
         }
@@ -312,29 +290,11 @@
             if (nextPiece) {
                 const offsetX = (4 - nextPiece.shape[0].length) / 2;
                 const offsetY = (4 - nextPiece.shape.length) / 2;
-
+                
                 nextPiece.shape.forEach((row, y) => {
                     row.forEach((value, x) => {
                         if (value) {
                             drawBlock(nextCtx, x + offsetX, y + offsetY, nextPiece.color);
-                        }
-                    });
-                });
-            }
-        }
-
-        function drawHoldPiece() {
-            holdCtx.fillStyle = COLORS.empty;
-            holdCtx.fillRect(0, 0, holdCanvas.width, holdCanvas.height);
-
-            if (holdPiece) {
-                const offsetX = (4 - holdPiece.shape[0].length) / 2;
-                const offsetY = (4 - holdPiece.shape.length) / 2;
-
-                holdPiece.shape.forEach((row, y) => {
-                    row.forEach((value, x) => {
-                        if (value) {
-                            drawBlock(holdCtx, x + offsetX, y + offsetY, holdPiece.color);
                         }
                     });
                 });
@@ -350,40 +310,6 @@
                 x: Math.floor(COLS / 2) - Math.floor(SHAPES[type][0].length / 2),
                 y: 0
             };
-        }
-
-        function holdCurrentPiece() {
-            if (!canHold) return;
-
-            canHold = false;
-
-            if (holdPiece === null) {
-                holdPiece = {
-                    shape: currentPiece.shape,
-                    color: currentPiece.color
-                };
-                currentPiece = nextPiece;
-                nextPiece = createPiece();
-                drawNextPiece();
-            } else {
-                const temp = {
-                    shape: currentPiece.shape,
-                    color: currentPiece.color
-                };
-                currentPiece = {
-                    shape: holdPiece.shape,
-                    color: holdPiece.color,
-                    x: Math.floor(COLS / 2) - Math.floor(holdPiece.shape[0].length / 2),
-                    y: 0
-                };
-                holdPiece = temp;
-            }
-
-            drawHoldPiece();
-
-            if (collision(currentPiece)) {
-                gameOver();
-            }
         }
 
         function collision(piece, offsetX = 0, offsetY = 0) {
@@ -422,7 +348,7 @@
 
         function clearLines() {
             let linesCleared = 0;
-
+            
             for (let row = ROWS - 1; row >= 0; row--) {
                 if (board[row].every(cell => cell !== 0)) {
                     board.splice(row, 1);
@@ -444,7 +370,7 @@
             const rotated = piece.shape[0].map((_, i) =>
                 piece.shape.map(row => row[i]).reverse()
             );
-
+            
             const previousShape = piece.shape;
             piece.shape = rotated;
 
@@ -461,7 +387,6 @@
                 clearLines();
                 currentPiece = nextPiece;
                 nextPiece = createPiece();
-                canHold = true;
                 drawNextPiece();
 
                 if (collision(currentPiece)) {
@@ -492,7 +417,6 @@
             clearLines();
             currentPiece = nextPiece;
             nextPiece = createPiece();
-            canHold = true;
             drawNextPiece();
 
             if (collision(currentPiece)) {
@@ -518,13 +442,10 @@
             score = 0;
             level = 1;
             lines = 0;
-            holdPiece = null;
-            canHold = true;
             updateScore();
             currentPiece = createPiece();
             nextPiece = createPiece();
             drawNextPiece();
-            drawHoldPiece();
             gameRunning = true;
             isPaused = false;
             document.getElementById('gameOver').style.display = 'none';
@@ -536,10 +457,10 @@
 
         function togglePause() {
             if (!gameRunning) return;
-
+            
             isPaused = !isPaused;
             document.getElementById('startBtn').textContent = isPaused ? '계속하기' : '일시정지';
-
+            
             if (!isPaused) {
                 lastTime = 0;
                 update();
@@ -569,7 +490,7 @@
         document.addEventListener('keydown', (e) => {
             if (!gameRunning || isPaused) return;
 
-            switch (e.key) {
+            switch(e.key) {
                 case 'ArrowLeft':
                     moveLeft();
                     break;
@@ -587,10 +508,6 @@
                 case ' ':
                     e.preventDefault();
                     hardDrop();
-                    break;
-                case 'c':
-                case 'C':
-                    holdCurrentPiece();
                     break;
                 case 'p':
                 case 'P':
@@ -618,5 +535,4 @@
         drawBoard();
     </script>
 </body>
-
 </html>
