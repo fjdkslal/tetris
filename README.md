@@ -1,15 +1,16 @@
-# 🎮 Flask 테트리스 게임
+# 🎮 Pygame 테트리스 게임
 
-Flask를 사용하여 만든 브라우저 기반 테트리스 게임입니다.
+Python의 Pygame 라이브러리를 사용하여 만든 데스크톱 테트리스 게임입니다.
 
 ## 🎯 기능
 
 - ✨ 7가지 테트리스 블록 (I, O, T, S, Z, J, L)
-- 🎨 모던한 UI 디자인 (그라디언트, 글래스모피즘)
-- 🎮 완전한 게임 컨트롤
+- 🎨 **네온 스타일 UI 디자인** (발광 효과, 다크 테마)
+- 🎮 완전한 게임 컨트롤 (연속 이동 지원)
 - 📦 블럭 보관함 (Hold) 기능
+- 👻 **고스트 블럭** (낙하 위치 미리보기)
 - 📊 점수, 레벨, 라인 수 추적
-- 👀 다음 블록 미리보기
+- 👀 다음 블록 5개 미리보기
 - ⏸️ 일시정지 기능
 - 🎨 3단 레이아웃 (보관함 | 게임 | 정보)
 
@@ -21,6 +22,7 @@ Flask를 사용하여 만든 브라우저 기반 테트리스 게임입니다.
 - `Space` : 즉시 낙하
 - `C` : 블럭 보관/교체
 - `P` : 일시정지/재개
+- `R` : 게임 오버 시 재시작
 
 ## 🚀 실행 방법
 
@@ -37,16 +39,10 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-### 3. 서버 실행
+### 3. 게임 실행
 
 ```bash
 python app.py
-```
-
-### 4. 브라우저에서 접속
-
-```
-http://localhost:5000
 ```
 
 ## 📁 프로젝트 구조
@@ -54,19 +50,16 @@ http://localhost:5000
 ```
 테트리스/
 ├── venv/                 # 가상환경 (git에서 제외)
-├── templates/
-│   └── index.html       # 게임 UI 및 로직
-├── app.py               # Flask 서버
-├── requirements.txt     # 의존성
+├── app.py               # Pygame 게임 로직 및 실행
+├── requirements.txt     # 의존성 (pygame)
 ├── .gitignore          # Git 제외 파일
 └── README.md           # 프로젝트 설명
 ```
 
 ## 🛠️ 기술 스택
 
-- **Backend**: Flask 3.0.0
-- **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
-- **Graphics**: HTML5 Canvas API
+- **Language**: Python 3
+- **Library**: Pygame
 
 ## 📝 라이센스
 
